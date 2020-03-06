@@ -1,5 +1,10 @@
 #pragma once
 #include <vector>
+#include <cmath>
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#define INF 300000
 
 using namespace std;
 
@@ -49,4 +54,27 @@ public:
 
     // 求两个圆的交点
     vector<pair<double, double>> getIntersect(Circle& geo);
+};
+
+class Individual {
+public:
+    struct pairHash
+    {
+        template<class T1, class T2>
+        std::size_t operator() (const std::pair<T1, T2>& p) const
+        {
+            auto h1 = std::hash<T1>{}(p.first);
+            auto h2 = std::hash<T2>{}(p.second);
+            return h1 ^ h2;
+        }
+    };
+
+    unordered_map<double, vector<Line>> lineMap;
+    unordered_set<pair<double, double>, pairHash> pointSet;
+    vector<Circle> circleList;
+
+    void parser();
+    void save(int x1, int y1, int x2, int y2);
+    void save(int a, int b, int r);
+    int calc();
 };
