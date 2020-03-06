@@ -1,6 +1,6 @@
 ﻿#include "geos.h"
-
-
+#include <string>
+#include <fstream>
 
 // 输入分析
 void Individual::parser() {
@@ -15,6 +15,25 @@ void Individual::parser() {
         }
         else if (c == 'C') {
             cin >> x1 >> y1 >> x2;
+            save(x1, y1, x2);
+        }
+    }
+}
+
+void Individual::parser(const string filename) {
+    ifstream fp;
+    fp.open(filename);
+    int n, x1, y1, x2, y2;
+    char c;
+    fp >> n;
+    while (n--) {
+        fp >> c;
+        if (c == 'L') {
+            fp >> x1 >> y1 >> x2 >> y2;
+            save(x1, y1, x2, y2);
+        }
+        else if (c == 'C') {
+            fp >> x1 >> y1 >> x2;
             save(x1, y1, x2);
         }
     }
@@ -52,9 +71,72 @@ int Individual::calc() {
     return pointSet.size();
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    string input = "";
+    string output = "";
+    if (argc == 3) {
+        string s1(argv[1]);
+        if (s1 == "-i") {
+            input = string(argv[2]);
+        }
+        else if (s1 == "-o") {
+            output = string(argv[2]);
+        }
+        else {
+            cout << "程序无法解析命令行参数！" << endl;
+            return 0;
+        }
+    }
+    else if (argc == 5) {
+        string s1(argv[1]);
+        string s2(argv[3]);
+        if (s1 == s2) {
+            cout << "程序无法解析命令行参数！" << endl;
+            return 0;
+        }
+        else {
+            if (s1 == "-i") {
+                input = string(argv[2]);
+            }
+            else if (s1 == "-o") {
+                output = string(argv[2]);
+            }
+            else {
+                cout << "程序无法解析命令行参数！" << endl;
+                return 0;
+            }
+            if (s2 == "-i") {
+                input = string(argv[4]);
+            }
+            else if (s2 == "-o") {
+                output = string(argv[4]);
+            }
+            else {
+                cout << "程序无法解析命令行参数！" << endl;
+                return 0;
+            }
+        }
+    }
+    else if (argc != 1) {
+        cout << "程序无法解析命令行参数！" << endl;
+        return 0;
+    }
     Individual ind;
-    ind.parser();
-    cout << ind.calc() << endl;
+    if (input != "") {
+        ind.parser(input);
+    }
+    else {
+        ind.parser();
+    }
+    
+    if (output != "") {
+        ofstream fp;
+        fp.open(output);
+        fp << ind.calc();
+    }
+    else {
+        cout << ind.calc() << endl;
+    }
+    return 0;
 }

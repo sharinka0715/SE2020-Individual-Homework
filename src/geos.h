@@ -74,6 +74,7 @@ public:
     vector<Circle> circleList;
 
     void parser();
+    void parser(const string filename);
     void save(int x1, int y1, int x2, int y2);
     void save(int a, int b, int r);
     int calc();
