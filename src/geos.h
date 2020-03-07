@@ -35,6 +35,10 @@ public:
     vector<pair<double, double>> getIntersect(Circle& geo);
 };
 
+/*
+圆
+a, b为圆心坐标，r为圆的半径
+*/
 class Circle {
 public:
     double a;
