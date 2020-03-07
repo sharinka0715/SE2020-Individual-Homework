@@ -26,9 +26,6 @@ public:
     // 由直线上点的x值算出y值
     double xCalY(double x);
 
-    // 由直线上点的y值算出x值
-    double yCalX(double y);
-
     // 求两条直线的交点
     pair<double, double> getIntersect(Line& geo);
 

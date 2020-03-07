@@ -29,14 +29,6 @@ double Line::xCalY(double x) {
     return k * x + b;
 }
 
-// 由直线上点的y值算出x值
-double Line::yCalX(double y) {
-    if (k == INF) {
-        return b;
-    }
-    return (y - b) / k;
-}
-
 // 求两条直线的交点
 pair<double, double> Line::getIntersect(Line& geo) {
     // 没有实现两条直线平行时的特判
@@ -98,12 +90,6 @@ Circle::Circle(double _a, double _b, double _r) {
 pair<double, double> Circle::xCalY(double x) {
     double tmp = sqrt(r * r - (x - a) * (x - a));
     return pair<double, double>(b + tmp, b - tmp);
-}
-
-// 由圆上点的y值算出x值
-pair<double, double> Circle::yCalX(double y) {
-    double tmp = sqrt(r * r - (y - b) * (y - b));
-    return pair<double, double>(a + tmp, a - tmp);
 }
 
 // 求直线和圆的交点
