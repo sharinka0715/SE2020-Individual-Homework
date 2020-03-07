@@ -12,6 +12,17 @@ Line::Line(double x1, double y1, double x2, double y2) {
     }
 }
 
+Line::Line(double a, double _b, double c) {
+    if (_b == 0) { // 直线平行于y轴
+        k = INF;
+        b = -c / a;
+    }
+    else {
+        k = -a / _b;
+        b = -c / _b;
+    }
+}
+
 // 由直线上点的x值算出y值
 double Line::xCalY(double x) {
     // k=INF时，x算不出来y，此处不考虑
@@ -40,7 +51,40 @@ pair<double, double> Line::getIntersect(Line& geo) {
 
 // 求直线和圆的交点
 vector<pair<double, double>> Line::getIntersect(Circle& geo) {
-    return vector<pair<double, double>>();
+    double c = geo.a;
+    double d = geo.b;
+    double r = geo.r;
+    vector<pair<double, double>> tmp;
+    if (k == INF) {
+        if (b < c + r && b > c - r) {
+            auto ys = geo.xCalY(b);
+            tmp.emplace_back(b, ys.first);
+            tmp.emplace_back(b, ys.second);
+        }
+        else if (b == c + r || b == c - r) {
+            tmp.emplace_back(b, d);
+        }
+    }
+    else {
+        double distance = (k * c - d + b) / (sqrt(k * k + 1));
+        if (distance <= r) {
+            double pa = k * k + 1;
+            double pb = 2 * (k * (b - d) - c);
+            double pc = c * c + (b - d) * (b - d) - r * r;
+            double p = pb * pb - 4 * pa * pc;
+            if (p == 0) {
+                double x = -pb / (2 * pa);
+                tmp.emplace_back(x, k * x + b);
+            }
+            else if (p > 0) {
+                double x = (-pb + sqrt(p))/ (2 * pa);
+                tmp.emplace_back(x, k * x + b);
+                x = (-pb - sqrt(p)) / (2 * pa);
+                tmp.emplace_back(x, k * x + b);
+            }
+        }
+    }
+    return tmp;
 }
 
 
@@ -64,10 +108,15 @@ pair<double, double> Circle::yCalX(double y) {
 
 // 求直线和圆的交点
 vector<pair<double, double>> Circle::getIntersect(Line& geo) {
-    return vector<pair<double, double>>();
+    return geo.getIntersect(*this);
 }
 
 // 求两个圆的交点
 vector<pair<double, double>> Circle::getIntersect(Circle& geo) {
+    double distance = (a - geo.a) * (a - geo.a) + (b - geo.b) * (b - geo.b);
+    if (distance <= (r + geo.r) * (r + geo.r) && distance >= (r - geo.r) * (r - geo.r)) {
+        Line tmpline(2 * (a - geo.a), 2 * (b - geo.b), geo.a * geo.a - a * a + geo.b * geo.b - b * b + r * r - geo.r * geo.r);
+        return getIntersect(tmpline);
+    }
     return vector<pair<double, double>>();
 }

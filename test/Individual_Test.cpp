@@ -116,4 +116,16 @@ namespace IndividualTest
 			Assert::AreEqual(16, ind->calc());
 		}
 	};
+
+	TEST_CLASS(ExtraTest) {
+	public:
+		TEST_METHOD(Example1) {
+			Individual* ind = new Individual;
+			ind->save(1, 0, 2);
+			ind->save(2, 2, 1);
+			ind->save(3, -2, 6);
+			ind->save(-1, 4, 4, -1);
+			Assert::AreEqual(6, ind->calc());
+		}
+	};
 }

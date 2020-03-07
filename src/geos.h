@@ -21,6 +21,7 @@ public:
     double b;
 
     Line(double x1, double y1, double x2, double y2);
+    Line(double a, double b, double c);
 
     // 由直线上点的x值算出y值
     double xCalY(double x);
@@ -65,10 +66,10 @@ public:
     struct pairHash
     {
         template<class T1, class T2>
-        std::size_t operator() (const std::pair<T1, T2>& p) const
+        size_t operator() (const pair<T1, T2>& p) const
         {
-            auto h1 = std::hash<T1>{}(p.first);
-            auto h2 = std::hash<T2>{}(p.second);
+            auto h1 = hash<T1>{}(p.first);
+            auto h2 = hash<T2>{}(p.second);
             return h1 ^ h2;
         }
     };

@@ -58,6 +58,7 @@ int Individual::calc() {
         lineList.push_back(it->second);
     }
 
+    // 直线和直线
     for (auto it1 = lineList.begin(); it1 != lineList.end() - 1; it1++) {
         for (auto it2 = it1 + 1; it2 != lineList.end(); it2++) {
             for (auto l1 = it1->begin(); l1 != it1->end(); l1++) {
@@ -67,7 +68,29 @@ int Individual::calc() {
             }
         }
     }
+    if (!circleList.empty()) {
+        //直线和圆
+        for (auto it1 = lineList.begin(); it1 != lineList.end(); it1++) {
+            for (auto l1 = it1->begin(); l1 != it1->end(); l1++) {
+                for (auto l2 = circleList.begin(); l2 != circleList.end(); l2++) {
+                    auto vec = l1->getIntersect(*l2);
+                    for (auto elm : vec) {
+                        pointSet.insert(elm);
+                    }
+                }
+            }
+        }
 
+        //圆和圆
+        for (auto l1 = circleList.begin(); l1 != circleList.end() - 1; l1++) {
+            for (auto l2 = l1 + 1; l2 != circleList.end(); l2++) {
+                auto vec = l1->getIntersect(*l2);
+                for (auto elm : vec) {
+                    pointSet.insert(elm);
+                }
+            }
+        }
+    }
     return pointSet.size();
 }
 
@@ -127,7 +150,7 @@ int main(int argc, char* argv[])
         ind.parser(input);
     }
     else {
-        ind.parser();
+        ind.parser("input.txt");
     }
     
     if (output != "") {
