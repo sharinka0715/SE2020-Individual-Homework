@@ -41,10 +41,10 @@ void Individual::parser(const string filename) {
 
 void Individual::save(int x1, int y1, int x2, int y2) {
     Line tmpLine(x1, y1, x2, y2);
-    if (lineMap.find(tmpLine.k) == lineMap.end()) {
-        lineMap.emplace(tmpLine.k, vector<Line>());
+    if (lineMap.find(tmpLine.xl) == lineMap.end()) {
+        lineMap.emplace(tmpLine.xl, vector<Line>());
     }
-    lineMap[tmpLine.k].emplace_back(tmpLine);
+    lineMap[tmpLine.xl].emplace_back(tmpLine);
 }
 
 void Individual::save(int a, int b, int r) {
@@ -59,11 +59,17 @@ int Individual::calc() {
     }
 
     // 直线和直线
-    for (auto it1 = lineList.begin(); it1 != lineList.end() - 1; it1++) {
-        for (auto it2 = it1 + 1; it2 != lineList.end(); it2++) {
-            for (auto l1 = it1->begin(); l1 != it1->end(); l1++) {
-                for (auto l2 = it2->begin(); l2 != it2->end(); l2++) {
-                    pointSet.insert(l1->getIntersect(*l2));
+    if (!lineList.empty()) {
+        auto lineListEnd = lineList.end();
+        for (auto it1 = lineList.begin(); it1 != lineListEnd - 1; it1++) {
+            for (auto it2 = it1 + 1; it2 != lineListEnd; it2++) {
+                auto it1End = it1->end();
+                auto it2End = it2->end();
+                for (auto l1 = it1->begin(); l1 != it1End; l1++) {
+                    for (auto l2 = it2->begin(); l2 != it2End; l2++) {
+                        auto point = l1->getIntersect(*l2);
+                        pointSet.insert(point);
+                    }
                 }
             }
         }
@@ -91,6 +97,12 @@ int Individual::calc() {
             }
         }
     }
+    /*
+    for (auto elm : pointSet) {
+        cout << elm.xup << " " << elm.xdown << " " << elm.yup << " " << elm.ydown << " " << endl;
+        cout << elm.xdelta << " " << elm.ydelta << endl << endl;
+    }
+    */
     return pointSet.size();
 }
 

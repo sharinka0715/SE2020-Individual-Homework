@@ -115,6 +115,16 @@ namespace IndividualTest
 			ind->save(-1, 7, -2, 4);
 			Assert::AreEqual(16, ind->calc());
 		}
+
+		TEST_METHOD(Complex4)
+		{
+			Individual* ind = new Individual;
+			ind->save(-2, -4, 3, -4);
+			ind->save(-1, 0, -2, 4);
+			ind->save(4, 4, -4, -12);
+			Assert::AreEqual(1, ind->calc());
+		}
+
 	};
 
 	TEST_CLASS(ExtraTest) {
@@ -126,6 +136,44 @@ namespace IndividualTest
 			ind->save(3, -2, 6);
 			ind->save(-1, 4, 4, -1);
 			Assert::AreEqual(6, ind->calc());
+		}
+
+		TEST_METHOD(Boundary1) {
+			Individual* ind = new Individual;
+			ind->save(-99999, -99999, 141419);
+			ind->save(99999, 99999, 141419);
+			ind->save(0, 0, 1, -1);
+			Assert::AreEqual(0, ind->calc());
+		}
+
+		TEST_METHOD(Boundary2) {
+			Individual* ind = new Individual;
+			ind->save(0, 0, 2);
+			ind->save(0, 0, 1);
+			ind->save(-2, 2, -2, -2);
+			ind->save(2, 2, 2, -2);
+			ind->save(-2, -2, 2, -2);
+			ind->save(2, 2, -2, 2);
+			Assert::AreEqual(8, ind->calc());
+		}
+
+		TEST_METHOD(Complex1) {
+			Individual* ind = new Individual;
+			ind->save(0, 0, 3);
+			ind->save(6, 8, 7);
+			ind->save(-8, -6, 7);
+			ind->save(5, 0, -7, 9);
+			ind->save(0, -5, -9, 7);
+			//ind->save(-3, -1, -3, 1);
+			//ind->save(-8, 8, 2);
+			ind->save(-14, 15, 1);
+			Assert::AreEqual(5, ind->calc());
+		}
+
+		TEST_METHOD(ad) {
+			Point a(-10, 1, -5, 10, 1, 5);
+			Point b(-15, 1, 15, 1);
+			Assert::AreEqual(true, a == b);
 		}
 	};
 }

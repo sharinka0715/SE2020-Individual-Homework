@@ -1,108 +1,111 @@
 #include "geos.h"
 
-Line::Line(double x1, double y1, double x2, double y2) {
-    if (x1 == x2) { // 直线平行于y轴
-        k = INF;
-        b = x1;
+Line::Line(long long x1, long long y1, long long x2, long long y2) {
+    d = x1 - x2;
+    k = (y1 - y2);
+    b = (x1 * y2 - x2 * y1);
+    if (d == 0) {
+        xl = INF;
     }
     else {
-        double tmp = x1 - x2;
-        k = (y1 - y2) / tmp;
-        b = (x1 * y2 - x2 * y1) / tmp;
+        xl = (double)k / d;
     }
 }
 
-Line::Line(double a, double _b, double c) {
-    if (_b == 0) { // 直线平行于y轴
-        k = INF;
-        b = -c / a;
+Line::Line(long long a, long long _b, long long c) {
+    k = a;
+    b = c;
+    d = _b;
+
+    if (d == 0) {
+        xl = INF;
     }
     else {
-        k = -a / _b;
-        b = -c / _b;
+        xl = (double)k / d;
     }
-}
-
-// 由直线上点的x值算出y值
-double Line::xCalY(double x) {
-    // k=INF时，x算不出来y，此处不考虑
-    return k * x + b;
 }
 
 // 求两条直线的交点
-pair<double, double> Line::getIntersect(Line& geo) {
+Point Line::getIntersect(Line& geo) {
     // 没有实现两条直线平行时的特判
-    if (k == INF) {
-        return pair<double, double>(b, geo.xCalY(b));
+    if (d == 0) {
+        return Point(-b, k, -geo.k * b + geo.b, geo.d * k);
     }
-    if (geo.k == INF) {
-        return pair<double, double>(geo.b, xCalY(geo.b));
+    if (geo.d == 0) {
+        return Point(-geo.b, geo.k, -k * geo.b + b, geo.k * d);
     }
-    return pair<double, double>((geo.b - b) / (k - geo.k), (geo.k * b - k * geo.b) / (geo.k - k));
+    long long xu = geo.b * d - b * geo.d;
+    long long yu = k * geo.b - geo.k * b;
+    long long down = k * geo.d - geo.k * d;
+    return Point(xu, down, yu, down);
 }
 
 // 求直线和圆的交点
-vector<pair<double, double>> Line::getIntersect(Circle& geo) {
-    double c = geo.a;
-    double d = geo.b;
-    double r = geo.r;
-    vector<pair<double, double>> tmp;
-    if (k == INF) {
-        if (b < c + r && b > c - r) {
-            auto ys = geo.xCalY(b);
-            tmp.emplace_back(b, ys.first);
-            tmp.emplace_back(b, ys.second);
-        }
-        else if (b == c + r || b == c - r) {
-            tmp.emplace_back(b, d);
+vector<Point> Line::getIntersect(Circle& geo) {
+    long long m = geo.a;
+    long long n = geo.b;
+    long long r = geo.r;
+    vector<Point> tmp;
+    if (d == 0) {
+        long long dl = (k * m + b) * (k * m + b);
+        long long dr = r * r * k * k;
+        if (dl <= dr) {
+            long long xu = -b;
+            long long xd = k;
+            long long yu = k * n;
+            long long yd = xd;
+            if (dl < dr) {
+                double delta = sqrt((b + k * m + k * r) * (k * r - k * m - b));
+                tmp.emplace_back(xu, xd, 0, yu, yd, delta / yd);
+                tmp.emplace_back(xu, xd, 0, yu, yd, -delta / yd);
+            }
+            else {
+                tmp.emplace_back(xu, xd, 0, yu, yd, 0);
+            }
         }
     }
     else {
-        double distance = (k * c - d + b) / (sqrt(k * k + 1));
-        if (distance <= r) {
-            double pa = k * k + 1;
-            double pb = 2 * (k * (b - d) - c);
-            double pc = c * c + (b - d) * (b - d) - r * r;
-            double p = pb * pb - 4 * pa * pc;
-            if (p == 0) {
-                double x = -pb / (2 * pa);
-                tmp.emplace_back(x, k * x + b);
+        long long dl = (k * m - d * n + b) * (k * m - d * n + b);
+        long long dr = r * r * (k * k + d * d);
+        if (dl <= dr) {
+            long long xu = m * d * d - k * b + d * k * n;
+            long long xd = d * d + k * k;
+            long long yu = b * d + k * k * n + k * d * m;
+            long long yd = xd;
+            if (dl < dr) {
+                double delta = sqrt(-b * b + 2 * b * d * n - 2 * b * k * m - d * d * n * n + d * d * r * r + 2 * d * k * m * n - k * k * m * m + k * k * r * r);
+                tmp.emplace_back(xu, xd, delta * d / xd, yu, yd, delta * k / yd);
+                tmp.emplace_back(xu, xd, -delta * d / xd, yu, yd, -delta * k / yd);
             }
-            else if (p > 0) {
-                double x = (-pb + sqrt(p))/ (2 * pa);
-                tmp.emplace_back(x, k * x + b);
-                x = (-pb - sqrt(p)) / (2 * pa);
-                tmp.emplace_back(x, k * x + b);
+            else {
+                tmp.emplace_back(xu, xd, yu, yd);
             }
         }
-    }
+    }    
     return tmp;
 }
 
 
-Circle::Circle(double _a, double _b, double _r) {
+Circle::Circle(long long _a, long long _b, long long _r) {
     a = _a;
     b = _b;
     r = _r;
 }
 
-// 由圆上点的x值算出y值
-pair<double, double> Circle::xCalY(double x) {
-    double tmp = sqrt(r * r - (x - a) * (x - a));
-    return pair<double, double>(b + tmp, b - tmp);
-}
-
 // 求直线和圆的交点
-vector<pair<double, double>> Circle::getIntersect(Line& geo) {
+vector<Point> Circle::getIntersect(Line& geo) {
     return geo.getIntersect(*this);
 }
 
 // 求两个圆的交点
-vector<pair<double, double>> Circle::getIntersect(Circle& geo) {
-    double distance = (a - geo.a) * (a - geo.a) + (b - geo.b) * (b - geo.b);
-    if (distance <= (r + geo.r) * (r + geo.r) && distance >= (r - geo.r) * (r - geo.r)) {
-        Line tmpline(2 * (a - geo.a), 2 * (b - geo.b), geo.a * geo.a - a * a + geo.b * geo.b - b * b + r * r - geo.r * geo.r);
-        return getIntersect(tmpline);
+vector<Point> Circle::getIntersect(Circle& geo) {
+    long long dl = (a - geo.a) * (a - geo.a) + (b - geo.b) * (b - geo.b);
+    if (dl <= (r + geo.r) * (r + geo.r) && dl >= (r - geo.r) * (r - geo.r)) {
+        long long xc = 2 * (geo.a - a);
+        long long yc = -2 * (geo.b - b);
+        long long c = a * a + b * b - r * r - geo.a * geo.a - geo.b * geo.b + geo.r * geo.r;
+        Line tmp(xc, yc, c);
+        return tmp.getIntersect(*this);
     }
-    return vector<pair<double, double>>();
+    return vector<Point>();
 }
