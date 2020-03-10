@@ -92,9 +92,10 @@ public:
             }
         }
         else {
-            if (xdelta == rc.xdelta && ydelta == rc.ydelta) {
-                return true;
-            }
+            double eps = 1e-12;
+            double a = fabs(xdelta - rc.xdelta);
+            double b = fabs(ydelta - rc.ydelta);
+            return (a < eps) && (b < eps);
         }
         return false;
     }
@@ -106,10 +107,11 @@ class pointHash
 public:
     size_t operator()(const Point& rc)const
     {
-        return hash<float>()(rc.xdelta) ^ hash<double>()(rc.ydelta);
+        return hash<float>()(rc.xdelta) ^ hash<float>()(rc.ydelta);
     }
 
 };
+
 /*
 直线
 k为斜率分子，b为y轴截距分子，d为分母。

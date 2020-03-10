@@ -100,6 +100,7 @@ int Individual::calc() {
     /*
     for (auto elm : pointSet) {
         cout << elm.xup << " " << elm.xdown << " " << elm.yup << " " << elm.ydown << " " << endl;
+        cout.precision(20);
         cout << elm.xdelta << " " << elm.ydelta << endl << endl;
     }
     */
